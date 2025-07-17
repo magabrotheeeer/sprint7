@@ -68,12 +68,14 @@ requests := []struct {
 		response := httptest.NewRecorder()
 		req := httptest.NewRequest("GET", v.req, nil)
 		handler.ServeHTTP(response, req)
+		require.Equal(t, http.StatusOK, response.Code)
 
-		have := len(strings.Split(response.Body.String(), ","))
+		var have int
 		if response.Body.String() == "" {
 			have = 0
+		}else {
+			have = len(strings.Split(response.Body.String(), ","))
 		}
-		require.Equal(t, http.StatusOK, response.Code)
 		assert.Equal(t, v.want, have)
 	}
 }
@@ -95,15 +97,16 @@ func TestCafeSearch(t *testing.T) {
 		response := httptest.NewRecorder()
 		req := httptest.NewRequest("GET", v.req, nil)
 		handler.ServeHTTP(response, req)
+		require.Equal(t, http.StatusOK, response.Code)
 
 		have := 0
 		body := strings.Split(response.Body.String(), ",")
+		assert.Len(t, body, v.want)
 		for _, value := range body {
-			if strings.Contains(strings.ToLower(value), v.search) {
+			if assert.Contains(t, strings.ToLower(value), v.search) {
 				have += 1
 			}
 		}
-		require.Equal(t, http.StatusOK, response.Code)
 		assert.Equal(t, v.want, have)
 	}
 }
