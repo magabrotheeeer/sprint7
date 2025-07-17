@@ -100,10 +100,13 @@ func TestCafeSearch(t *testing.T) {
 		require.Equal(t, http.StatusOK, response.Code)
 
 		have := 0
-		body := strings.Split(response.Body.String(), ",")
+		var body []string
+		if response.Body.String() != "" {
+			body = strings.Split(response.Body.String(), ",")
+		}
 		assert.Len(t, body, v.want)
 		for _, value := range body {
-			if assert.Contains(t, strings.ToLower(value), v.search) {
+			if strings.Contains(strings.ToLower(value), v.search) {
 				have += 1
 			}
 		}
